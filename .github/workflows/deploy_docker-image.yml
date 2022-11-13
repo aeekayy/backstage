@@ -2,6 +2,9 @@ name: Build and push Docker image
 on:
   repository_dispatch:
     types: [release-published]
+  push:
+    branches:
+      - 'master'
 
 jobs:
   build:
@@ -62,11 +65,11 @@ jobs:
       - name: create-app
         run: npx @backstage/create-app
         env:
-          BACKSTAGE_APP_NAME: example-app
+          BACKSTAGE_APP_NAME: idp-app
 
       - name: yarn build
         run: yarn build
-        working-directory: ./example-app
+        working-directory: ./idp-app
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -81,8 +84,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: './example-app'
-          file: ./example-app/packages/backend/Dockerfile
+          context: './idp-app'
+          file: ./idp-app/packages/backend/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/backstage:latest
